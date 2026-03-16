@@ -1,0 +1,13 @@
+../Core/Src/main.c:87:20:enqueue_button_event	2
+../Core/Src/main.c:97:6:check_packet	4
+../Core/Src/main.c:104:6:HAL_UART_RxCpltCallback	7
+../Core/Src/main.c:152:6:process_packet	3
+../Core/Src/main.c:171:6:process_button_events	12
+../Core/Src/main.c:191:6:print_pots	1
+../Core/Src/main.c:197:5:_write	4
+../Core/Src/main.c:215:5:main	2
+../Core/Src/main.c:273:6:SystemClock_Config	3
+../Core/Src/main.c:315:13:MX_USART1_UART_Init	2
+../Core/Src/main.c:348:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:381:13:MX_GPIO_Init	1
+../Core/Src/main.c:414:6:Error_Handler	1

@@ -1,0 +1,12 @@
+../Core/Src/mpu5050.c:7:14:wrap	16	static
+../Core/Src/mpu5050.c:16:26:MPU6050_WriteByte	32	static
+../Core/Src/mpu5050.c:31:26:MPU6050_ReadBytes	40	static
+../Core/Src/mpu5050.c:49:9:MPU6050_Init	24	static
+../Core/Src/mpu5050.c:84:9:MPU6050_SetGyroConfig	16	static
+../Core/Src/mpu5050.c:100:9:MPU6050_SetAccConfig	16	static
+../Core/Src/mpu5050.c:118:6:MPU6050_SetGyroOffsets	24	static
+../Core/Src/mpu5050.c:125:6:MPU6050_SetAccOffsets	24	static
+../Core/Src/mpu5050.c:132:6:MPU6050_SetFilterGyroCoef	16	static
+../Core/Src/mpu5050.c:142:6:MPU6050_FetchData	56	static
+../Core/Src/mpu5050.c:164:6:MPU6050_Update	40	static
+../Core/Src/mpu5050.c:198:6:MPU6050_CalcOffsets	48	static

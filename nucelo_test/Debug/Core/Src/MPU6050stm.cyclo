@@ -1,0 +1,4 @@
+../Core/Src/MPU6050stm.cpp:24:1:MPU6050::MPU6050(I2C_HandleTypeDef*)	1
+../Core/Src/MPU6050stm.cpp:28:6:bool MPU6050::begin()	0
+../Core/Src/MPU6050stm.cpp:33:8:int8_t MPU6050::write_i2c(uint8_t, uint8_t)	1
+../Core/Src/MPU6050stm.cpp:37:8:int8_t MPU6050::read_i2c(uint8_t, uint8_t)	1

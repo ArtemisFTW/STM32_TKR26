@@ -1,0 +1,20 @@
+../Core/Src/TFLI2Cstm.cpp:10:1:TFLI2C::TFLI2C()	1
+../Core/Src/TFLI2Cstm.cpp:11:1:TFLI2C::~TFLI2C()	1
+../Core/Src/TFLI2Cstm.cpp:16:6:bool TFLI2C::getData(int16_t&, int16_t&, int16_t&, uint8_t)	5
+../Core/Src/TFLI2Cstm.cpp:47:6:bool TFLI2C::getData(int16_t&, uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:56:6:bool TFLI2C::Get_Time(uint16_t&, uint8_t)	3
+../Core/Src/TFLI2Cstm.cpp:69:6:bool TFLI2C::Get_Prod_Code(uint8_t*, uint8_t)	3
+../Core/Src/TFLI2Cstm.cpp:79:6:bool TFLI2C::Get_Firmware_Version(uint8_t*, uint8_t)	3
+../Core/Src/TFLI2Cstm.cpp:89:6:bool TFLI2C::Save_Settings(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:94:6:bool TFLI2C::Soft_Reset(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:99:6:bool TFLI2C::Set_I2C_Addr(uint8_t, uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:105:6:bool TFLI2C::Set_Enable(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:110:6:bool TFLI2C::Set_Disable(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:115:6:bool TFLI2C::Set_Frame_Rate(uint16_t&, uint8_t)	3
+../Core/Src/TFLI2Cstm.cpp:125:6:bool TFLI2C::Get_Frame_Rate(uint16_t&, uint8_t)	3
+../Core/Src/TFLI2Cstm.cpp:138:6:bool TFLI2C::Hard_Reset(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:143:6:bool TFLI2C::Set_Cont_Mode(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:148:6:bool TFLI2C::Set_Trig_Mode(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:153:6:bool TFLI2C::Set_Trigger(uint8_t)	1
+../Core/Src/TFLI2Cstm.cpp:161:6:bool TFLI2C::readReg(uint8_t, uint8_t)	2
+../Core/Src/TFLI2Cstm.cpp:178:6:bool TFLI2C::writeReg(uint8_t, uint8_t, uint8_t)	2
