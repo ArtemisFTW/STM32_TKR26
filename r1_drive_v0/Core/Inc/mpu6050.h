@@ -1,14 +1,9 @@
 #ifndef MPU6050_H
 #define MPU6050_H
 
-#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal.h"   // change to your exact MCU family
 #include <stdint.h>
 #include <stdbool.h>
-
-/* ---- C++ compatibility ---- */
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ---------- DEVICE ADDRESS ---------- */
 
@@ -28,7 +23,7 @@ extern "C" {
 /* ---------- CONSTANTS ---------- */
 
 #define RAD_2_DEG             57.29578f
-#define CALIB_OFFSET_NB_MES   500
+#define CALIB_OFFSET_NB_MES   1000
 #define TEMP_LSB_2_DEGREE     340.0f
 #define TEMP_LSB_OFFSET       12412.0f
 
@@ -38,12 +33,17 @@ extern "C" {
 
 typedef struct
 {
+    /* HAL */
     I2C_HandleTypeDef *hi2c;
+
+    /* Address */
     uint8_t address;
 
+    /* Scaling */
     float gyro_lsb_to_degsec;
     float acc_lsb_to_g;
 
+    /* Offsets */
     float gyroXoffset;
     float gyroYoffset;
     float gyroZoffset;
@@ -52,6 +52,7 @@ typedef struct
     float accYoffset;
     float accZoffset;
 
+    /* Raw / scaled data */
     float temp;
     float accX;
     float accY;
@@ -60,6 +61,7 @@ typedef struct
     float gyroY;
     float gyroZ;
 
+    /* Angles */
     float angleAccX;
     float angleAccY;
 
@@ -67,22 +69,27 @@ typedef struct
     float angleY;
     float angleZ;
 
+    /* Filter */
     float filterGyroCoef;
 
-    uint32_t preInterval;
-    uint32_t prevTick;
+    /* Timing */
+    //uint32_t preInterval;
+    uint32_t last;
 
+    /* Mounting */
     bool upsideDownMounting;
 
 } MPU6050_t;
 
 /* ---------- API ---------- */
 
+/* Init */
 uint8_t MPU6050_Init(MPU6050_t *mpu,
                      I2C_HandleTypeDef *hi2c,
                      uint8_t gyro_cfg,
                      uint8_t acc_cfg);
 
+/* Configuration */
 uint8_t MPU6050_SetGyroConfig(MPU6050_t *mpu, uint8_t cfg);
 uint8_t MPU6050_SetAccConfig(MPU6050_t *mpu, uint8_t cfg);
 
@@ -90,19 +97,13 @@ void MPU6050_SetGyroOffsets(MPU6050_t *mpu, float x, float y, float z);
 void MPU6050_SetAccOffsets (MPU6050_t *mpu, float x, float y, float z);
 
 void MPU6050_SetFilterGyroCoef(MPU6050_t *mpu, float coef);
-
 static inline void MPU6050_SetFilterAccCoef(MPU6050_t *mpu, float coef)
 {
     MPU6050_SetFilterGyroCoef(mpu, 1.0f - coef);
 }
 
+/* Data */
 void MPU6050_FetchData(MPU6050_t *mpu);
 void MPU6050_Update(MPU6050_t *mpu);
 void MPU6050_CalcOffsets(MPU6050_t *mpu, uint8_t calcGyro, uint8_t calcAcc);
-
-/* ---- end C++ compatibility ---- */
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif /* MPU6050_H */

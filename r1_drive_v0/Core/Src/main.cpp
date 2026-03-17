@@ -93,10 +93,6 @@ int main(void)
 	DWT->CYCCNT = 0;                                // Reset counter
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;            // Enable cycle counter
 
-	uint32_t micros(void)
-	{
-	    return DWT->CYCCNT / (SystemCoreClock / 1000000);
-	}
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -124,35 +120,24 @@ int main(void)
 	/* USER CODE BEGIN 2 */
 	MPU6050_t mpu;
 
-	HAL_Delay(50);
+	HAL_Delay(200);
 
 	printf("STM32 Booting...\r\n");
 	HAL_Delay(10);
 
-	if (MPU6050_Init(&mpu, &hi2c1, 1, 0) != 0) {
+	if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
 		printf("MPU6050 initialization failed!\r\n");
 		while(1);
 	}
 
 	printf("MPU6050 Initialized\r\n");
-	HAL_Delay(500);
-
-	for(int i=0;i<200;i++)
-	{
-		MPU6050_FetchData(&mpu);
-		HAL_Delay(2);
-	}
+	HAL_Delay(2000);
 
 	MPU6050_CalcOffsets(&mpu,1,1);
 
+	mpu.last = micros();
+
 	MPU6050_Update(&mpu);
-
-	mpu.angleX = mpu.angleAccX;
-	mpu.angleY = mpu.angleAccY;
-	mpu.angleZ = 0;
-
-	mpu.prevTick = HAL_GetTick();
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -162,16 +147,16 @@ int main(void)
 		/* USER CODE END WHILE */
 		MPU6050_Update(&mpu);
 		printf("angleX: %.4f\r\n", mpu.angleX);
-//		motor.DutyM1(128,10000);
-//		motor.DutyM2(128,10000);
-//		motor.DutyM1(130,10000);
-//		motor.DutyM2(130,10000);
-//		HAL_Delay(2000);
-//		motor.DutyM1(128,-10000);
-//		motor.DutyM2(128,-10000);
-//		motor.DutyM1(130,-10000);
-//		motor.DutyM2(130,-10000);
-//		HAL_Delay(2000);
+		//		motor.DutyM1(128,10000);
+		//		motor.DutyM2(128,10000);
+		//		motor.DutyM1(130,10000);
+		//		motor.DutyM2(130,10000);
+		//		HAL_Delay(2000);
+		//		motor.DutyM1(128,-10000);
+		//		motor.DutyM2(128,-10000);
+		//		motor.DutyM1(130,-10000);
+		//		motor.DutyM2(130,-10000);
+		//		HAL_Delay(2000);
 
 		/* USER CODE BEGIN 3 */
 	}

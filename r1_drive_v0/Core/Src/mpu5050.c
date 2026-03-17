@@ -11,11 +11,9 @@ static float wrap(float angle, float limit)
 	return angle;
 }
 
-static float apply_deadband(float value, float deadband)
+uint32_t micros(void)
 {
-    if (fabsf(value) < deadband)
-        return 0.0f;
-    return value;
+	return DWT->CYCCNT / (SystemCoreClock / 1000000);
 }
 
 /* ---------- LOW LEVEL I2C ---------- */
@@ -34,6 +32,7 @@ static HAL_StatusTypeDef MPU6050_WriteByte(MPU6050_t *mpu,
 			HAL_MAX_DELAY
 	);
 }
+
 static HAL_StatusTypeDef MPU6050_ReadBytes(MPU6050_t *mpu,
 		uint8_t reg,
 		uint8_t *buf,
@@ -60,14 +59,13 @@ uint8_t MPU6050_Init(MPU6050_t *mpu,
 	mpu->hi2c = hi2c;
 
 	/* Wake up device */
-	if (MPU6050_WriteByte(mpu, MPU6050_PWR_MGMT_1_REGISTER, 0x01) != HAL_OK)
-		return 1;
+	if(MPU6050_WriteByte(mpu, MPU6050_PWR_MGMT_1_REGISTER, 0x01)!=HAL_OK) return 1;
 
-	MPU6050_WriteByte(mpu, MPU6050_SMPLRT_DIV_REGISTER, 0x00);
-	MPU6050_WriteByte(mpu, MPU6050_CONFIG_REGISTER, 0x00);
+	if(MPU6050_WriteByte(mpu, MPU6050_SMPLRT_DIV_REGISTER, 0x00)!=HAL_OK) return 2;
+	if(MPU6050_WriteByte(mpu, MPU6050_CONFIG_REGISTER, 0x03)!=HAL_OK) return 3;
 
-	MPU6050_SetGyroConfig(mpu, gyro_cfg);
-	MPU6050_SetAccConfig(mpu, acc_cfg);
+	if(MPU6050_SetGyroConfig(mpu, gyro_cfg)!=HAL_OK) return 4;
+	if(MPU6050_SetAccConfig(mpu, acc_cfg)!=HAL_OK) return 5;
 
 	/* Defaults */
 	MPU6050_SetGyroOffsets(mpu, 0, 0, 0);
@@ -80,8 +78,8 @@ uint8_t MPU6050_Init(MPU6050_t *mpu,
 	mpu->angleY = mpu->angleAccY;
 	mpu->angleZ = 0.0f;
 
-	mpu->prevTick = HAL_GetTick();
-	mpu->preInterval = HAL_GetTick();
+	mpu->last = micros();
+	//mpu->preInterval = HAL_GetTick();
 	return 0;
 }
 
@@ -171,9 +169,25 @@ void MPU6050_Update(MPU6050_t *mpu)
 {
 	MPU6050_FetchData(mpu);
 
-	uint32_t now = HAL_GetTick();
-	float dt = (now - mpu->prevTick) / 1000.0f;
-	mpu->prevTick = now;
+	static float gz_filt = 0.0f;
+
+	gz_filt = mpu->filterGyroCoef * gz_filt + (1.0f - mpu->filterGyroCoef) * mpu->gyroZ;
+
+	mpu->gyroZ = gz_filt;
+
+//	uint32_t now = micros();
+//	uint32_t diff = now - mpu->last;
+//	float dt = diff * 1e-6f;
+//	mpu->last = now;
+//
+//	if (dt > 0.1f) dt = 0;
+
+	float dt = (micros() - mpu->last) * 1e-6f;
+	mpu->last = micros();
+
+	// clamp dt to avoid spikes/jitter
+	if (dt <= 0 || dt > 0.02f)
+	    dt = 0.01f;
 
 	// ACC angles
 	float sgZ = (mpu->accZ < 0.0f) ? -1.0f : 1.0f;
@@ -197,8 +211,20 @@ void MPU6050_Update(MPU6050_t *mpu)
 			mpu->filterGyroCoef * (mpu->angleY + mpu->gyroY * dt) +
 			(1.0f - mpu->filterGyroCoef) * mpu->angleAccY;
 
-	mpu->angleZ += mpu->gyroZ * dt;
+	static float biasZ = 0.0f;
 
+	// detect "stationary" condition
+	if (fabs(mpu->gyroZ) < 0.1f) {
+	    biasZ = 0.999f * biasZ + 0.001f * mpu->gyroZ;
+	}
+
+	// remove bias
+	mpu->gyroZ -= biasZ;
+
+	if (fabs(mpu->gyroZ) < 0.05f)
+		mpu->gyroZ = 0.0f;
+
+	mpu->angleZ += mpu->gyroZ * dt;
 }
 
 
