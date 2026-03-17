@@ -114,29 +114,27 @@ int main(void)
 	MX_I2C1_Init();
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
-		MPU6050_t mpu;
+	MPU6050_t mpu;
 
-		HAL_Delay(200);
+	HAL_Delay(200);
 
-		printf("STM32 Booting...\r\n");
-		HAL_Delay(10);
+	printf("STM32 Booting...\r\n");
+	HAL_Delay(10);
 
-		if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
+	if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
 		printf("MPU6050 initialization failed!\r\n");
 		while(1);
-		}
+	}
 
-		printf("MPU6050 Initialized\r\n");
-		HAL_Delay(2000);
+	printf("MPU6050 Initialized\r\n");
+	HAL_Delay(2000);
 
-		MPU6050_CalcOffsets(&mpu,1,1);
+	MPU6050_CalcOffsets(&mpu,1,1);
 
-		mpu.last = micros();
+	mpu.last = micros();
 
-		MPU6050_Update(&mpu);
+	MPU6050_Update(&mpu);
 
-//		float dt = 0;
-//		uint32_t now=0,last=0;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -144,15 +142,11 @@ int main(void)
 	while (1)
 	{
 		MPU6050_Update(&mpu);
-		//now=micros();
-		//dt=(now-last)*1e-6;
-		//last=now;
 		static uint32_t t=0;
 		if(HAL_GetTick()-t>10){
 			t=HAL_GetTick();
 			printf("angz: %.3f\r\n", mpu.angleZ);
 		}
-		//printf("%.3f\r\n",mpu.angleZ);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
