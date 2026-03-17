@@ -73,6 +73,11 @@ int _write(int fd, char* ptr, int len) {
 	}
 	return -1;
 }
+
+//uint32_t micros(void)
+//{
+//    return DWT->CYCCNT / (SystemCoreClock / 1000000);
+//}
 /* USER CODE END 0 */
 
 /**
@@ -83,7 +88,9 @@ int main(void)
 {
 
 	/* USER CODE BEGIN 1 */
-
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // Enable tracing
+	DWT->CYCCNT = 0;                                // Reset counter
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;            // Enable cycle counter
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -107,44 +114,29 @@ int main(void)
 	MX_I2C1_Init();
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-	DWT->CYCCNT = 0;
-	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+		MPU6050_t mpu;
 
-	MPU6050_t mpu;
+		HAL_Delay(200);
 
-	HAL_Delay(50);
+		printf("STM32 Booting...\r\n");
+		HAL_Delay(10);
 
-	printf("STM32 Booting...\r\n");
-	HAL_Delay(10);
-
-	if (MPU6050_Init(&mpu, &hi2c1, 1, 0) != 0) {
+		if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
 		printf("MPU6050 initialization failed!\r\n");
 		while(1);
-	}
+		}
 
-	printf("MPU6050 Initialized\r\n");
-	HAL_Delay(500);
+		printf("MPU6050 Initialized\r\n");
+		HAL_Delay(2000);
 
-	for(int i=0;i<200;i++)
-	{
-	    MPU6050_FetchData(&mpu);
-	    HAL_Delay(2);
-	}
+		MPU6050_CalcOffsets(&mpu,1,1);
 
-	MPU6050_CalcOffsets(&mpu,1,1);
+		mpu.last = micros();
 
-	MPU6050_Update(&mpu);
+		MPU6050_Update(&mpu);
 
-	mpu.angleX = mpu.angleAccX;
-	mpu.angleY = mpu.angleAccY;
-	mpu.angleZ = 0;
-
-	mpu.prevTick = HAL_GetTick();
-
-	float angz=0;
-	uint32_t t = 0;
-	uint32_t now=0;
+//		float dt = 0;
+//		uint32_t now=0,last=0;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -152,8 +144,15 @@ int main(void)
 	while (1)
 	{
 		MPU6050_Update(&mpu);
-
-		printf("angleZ: %.4f\r\n", mpu.angleZ);
+		//now=micros();
+		//dt=(now-last)*1e-6;
+		//last=now;
+		static uint32_t t=0;
+		if(HAL_GetTick()-t>10){
+			t=HAL_GetTick();
+			printf("angz: %.3f\r\n", mpu.angleZ);
+		}
+		//printf("%.3f\r\n",mpu.angleZ);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */

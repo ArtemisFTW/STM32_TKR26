@@ -23,7 +23,7 @@
 /* ---------- CONSTANTS ---------- */
 
 #define RAD_2_DEG             57.29578f
-#define CALIB_OFFSET_NB_MES   500
+#define CALIB_OFFSET_NB_MES   1000
 #define TEMP_LSB_2_DEGREE     340.0f
 #define TEMP_LSB_OFFSET       12412.0f
 
@@ -73,8 +73,8 @@ typedef struct
     float filterGyroCoef;
 
     /* Timing */
-    uint32_t preInterval;
-    uint32_t prevTick;
+    //uint32_t preInterval;
+    uint32_t last;
 
     /* Mounting */
     bool upsideDownMounting;
