@@ -118,26 +118,28 @@ int main(void)
 	MX_USART2_UART_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
-	MPU6050_t mpu;
-
-	HAL_Delay(200);
-
-	printf("STM32 Booting...\r\n");
-	HAL_Delay(10);
-
-	if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
-		printf("MPU6050 initialization failed!\r\n");
-		while(1);
-	}
-
-	printf("MPU6050 Initialized\r\n");
-	HAL_Delay(2000);
-
-	MPU6050_CalcOffsets(&mpu,1,1);
-
-	mpu.last = micros();
-
-	MPU6050_Update(&mpu);
+//	MPU6050_t mpu;
+//
+//	HAL_Delay(200);
+//
+//	printf("STM32 Booting...\r\n");
+//	HAL_Delay(10);
+//
+//	if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
+//		printf("MPU6050 initialization failed!\r\n");
+//		while(1){
+//			//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+//		}
+//	}
+//
+//	printf("MPU6050 Initialized\r\n");
+//	HAL_Delay(2000);
+//
+//	MPU6050_CalcOffsets(&mpu,1,1);
+//
+//	mpu.last = micros();
+//
+//	MPU6050_Update(&mpu);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -145,19 +147,13 @@ int main(void)
 	while (1)
 	{
 		/* USER CODE END WHILE */
-		MPU6050_Update(&mpu);
-		printf("angleX: %.4f\r\n", mpu.angleX);
-		//		motor.DutyM1(128,10000);
-		//		motor.DutyM2(128,10000);
-		//		motor.DutyM1(130,10000);
-		//		motor.DutyM2(130,10000);
-		//		HAL_Delay(2000);
-		//		motor.DutyM1(128,-10000);
-		//		motor.DutyM2(128,-10000);
-		//		motor.DutyM1(130,-10000);
-		//		motor.DutyM2(130,-10000);
-		//		HAL_Delay(2000);
-
+//		MPU6050_Update(&mpu);
+//		printf("angleZ: %.4f\r\n", mpu.angleZ);
+//				motor.DutyM1(128,10000);
+//				motor.DutyM2(128,10000);
+//				motor.DutyM1(130,10000);
+//				motor.DutyM2(130,10000);
+		printf("hello\r\n");
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */

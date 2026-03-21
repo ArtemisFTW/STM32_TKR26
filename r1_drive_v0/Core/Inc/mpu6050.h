@@ -81,6 +81,10 @@ typedef struct
 
 } MPU6050_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ---------- API ---------- */
 
 /* Init */
@@ -107,3 +111,9 @@ void MPU6050_FetchData(MPU6050_t *mpu);
 void MPU6050_Update(MPU6050_t *mpu);
 void MPU6050_CalcOffsets(MPU6050_t *mpu, uint8_t calcGyro, uint8_t calcAcc);
 #endif /* MPU6050_H */
+
+uint32_t micros(void);
+
+#ifdef __cplusplus
+}
+#endif

@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000091d4  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000c560  00000000  00000000  00009204  2**0
+ 12 .debug_info   0000c55b  00000000  00000000  00009204  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001e3c  00000000  00000000  00015764  2**0
+ 13 .debug_abbrev 00001e27  00000000  00000000  0001575f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000b10  00000000  00000000  000175a0  2**3
+ 14 .debug_aranges 00000b10  00000000  00000000  00017588  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 0000089a  00000000  00000000  000180b0  2**0
+ 15 .debug_rnglists 0000089a  00000000  00000000  00018098  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000228a4  00000000  00000000  0001894a  2**0
+ 16 .debug_macro  000228a4  00000000  00000000  00018932  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000edcd  00000000  00000000  0003b1ee  2**0
+ 17 .debug_line   0000edc9  00000000  00000000  0003b1d6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000cd6c5  00000000  00000000  00049fbb  2**0
+ 18 .debug_str    000cd6c5  00000000  00000000  00049f9f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00117680  2**0
+ 19 .comment      00000043  00000000  00000000  00117664  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00003eec  00000000  00000000  001176c4  2**2
+ 20 .debug_frame  00003eec  00000000  00000000  001176a8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000005c  00000000  00000000  0011b5b0  2**0
+ 21 .debug_line_str 0000005c  00000000  00000000  0011b594  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1331,20 +1331,20 @@ int main(void)
 	MX_USART2_UART_Init();
  8000f94:	f000 f8f8 	bl	8001188 <MX_USART2_UART_Init>
 	/* USER CODE BEGIN 2 */
-		MPU6050_t mpu;
+	MPU6050_t mpu;
 
-		HAL_Delay(200);
+	HAL_Delay(200);
  8000f98:	20c8      	movs	r0, #200	@ 0xc8
  8000f9a:	f001 f809 	bl	8001fb0 <HAL_Delay>
 
-		printf("STM32 Booting...\r\n");
+	printf("STM32 Booting...\r\n");
  8000f9e:	4824      	ldr	r0, [pc, #144]	@ (8001030 <main+0xd0>)
  8000fa0:	f004 fba4 	bl	80056ec <puts>
-		HAL_Delay(10);
+	HAL_Delay(10);
  8000fa4:	200a      	movs	r0, #10
  8000fa6:	f001 f803 	bl	8001fb0 <HAL_Delay>
 
-		if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
+	if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
  8000faa:	1d38      	adds	r0, r7, #4
  8000fac:	2300      	movs	r3, #0
  8000fae:	2201      	movs	r2, #1
@@ -1359,28 +1359,28 @@ int main(void)
 		while(1);
  8000fc2:	bf00      	nop
  8000fc4:	e7fd      	b.n	8000fc2 <main+0x62>
-		}
+	}
 
-		printf("MPU6050 Initialized\r\n");
+	printf("MPU6050 Initialized\r\n");
  8000fc6:	481d      	ldr	r0, [pc, #116]	@ (800103c <main+0xdc>)
  8000fc8:	f004 fb90 	bl	80056ec <puts>
-		HAL_Delay(2000);
+	HAL_Delay(2000);
  8000fcc:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
  8000fd0:	f000 ffee 	bl	8001fb0 <HAL_Delay>
 
-		MPU6050_CalcOffsets(&mpu,1,1);
+	MPU6050_CalcOffsets(&mpu,1,1);
  8000fd4:	1d3b      	adds	r3, r7, #4
  8000fd6:	2201      	movs	r2, #1
  8000fd8:	2101      	movs	r1, #1
  8000fda:	4618      	mov	r0, r3
  8000fdc:	f000 fcda 	bl	8001994 <MPU6050_CalcOffsets>
 
-		mpu.last = micros();
+	mpu.last = micros();
  8000fe0:	f000 f92a 	bl	8001238 <micros>
  8000fe4:	4603      	mov	r3, r0
  8000fe6:	663b      	str	r3, [r7, #96]	@ 0x60
 
-		MPU6050_Update(&mpu);
+	MPU6050_Update(&mpu);
  8000fe8:	1d3b      	adds	r3, r7, #4
  8000fea:	4618      	mov	r0, r3
  8000fec:	f000 fb74 	bl	80016d8 <MPU6050_Update>
@@ -1393,9 +1393,6 @@ int main(void)
  8000ff0:	1d3b      	adds	r3, r7, #4
  8000ff2:	4618      	mov	r0, r3
  8000ff4:	f000 fb70 	bl	80016d8 <MPU6050_Update>
-		//now=micros();
-		//dt=(now-last)*1e-6;
-		//last=now;
 		static uint32_t t=0;
 		if(HAL_GetTick()-t>10){
  8000ff8:	f000 ffce 	bl	8001f98 <HAL_GetTick>
