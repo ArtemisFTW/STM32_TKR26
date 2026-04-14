@@ -74,6 +74,7 @@ bool stm32RoboClaw::write_n(uint8_t cnt, ... )
     return true;
 }
 
+
 bool stm32RoboClaw::read_n(uint8_t cnt,uint8_t address,uint8_t cmd,...)
 {
     uint32_t value=0;

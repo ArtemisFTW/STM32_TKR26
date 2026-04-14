@@ -22,8 +22,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32roboclaw.h"
-#include "MPU6050.h"
-#include <stdio.h>
+#include "bno055_stm32.h"
+#include<stdbool.h>
+#include<stdio.h>
+#include<string.h>
+#include<math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +50,7 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-
+UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -59,13 +62,176 @@ static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
+static void MX_USART6_UART_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int target=0;
+float error= 0;
+float preverror=0;
+float P=5;
+float I=0;
+float D=0;
+float intg;
+
+int16_t vFL, vFR, vBL, vBR;
+int16_t vMAX = 0;
+int16_t maxspeed = 32767;
+
+int16_t PID(float angz){
+	error=target-angz;
+	intg += error*I;
+	int16_t output = (error*P)+intg+((error-preverror)*D);
+	if(output>100) output = 100;
+	if(output<-100) output = -100;
+	preverror=error;
+	return output;
+}
+
+long map(long x, long in_min, long in_max, long out_min, long out_max)
+{
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+uint8_t rx_byte;
+volatile uint8_t rx_count=0;
+volatile bool ready= false;
+volatile uint8_t idx=0;
+uint8_t packet_buffer[11];
+
+//data
+int8_t LX;
+int8_t LY;
+int8_t RX;
+int8_t RY;
+uint8_t L2,R2;
+uint16_t buttons;
+uint16_t prev_buttons;
+
+#define EVENT_QUEUE_SIZE 8
+volatile uint16_t event_queue[8];
+volatile uint8_t event_head =0;
+volatile uint8_t event_tail =0;
+volatile uint16_t prev_buttons_isr = 0;
+
+#define NUM_BUTTONS 10
+volatile uint8_t butt[NUM_BUTTONS] = {0};
+
+static inline void enqueue_button_event(uint16_t pressed)
+{
+	uint8_t next = (event_head + 1) % EVENT_QUEUE_SIZE;
+
+	if (next != event_tail) {   // queue not full
+		event_queue[event_head] = pressed;
+		event_head = next;
+	}
+}
+
+bool check_packet(uint8_t *buf){
+	if(buf[0]!=0xAA || buf[10]!=0x55) return false;
+	uint8_t sum=0;
+	for(int i=0;i<=8;i++) sum+=buf[i];
+	return ((uint8_t)(0-sum)==buf[9]);
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART3)
+	{
+		if (idx == 0)
+		{
+			if (rx_byte == 0xAA)
+			{
+				packet_buffer[idx++] = rx_byte;
+			}
+		}
+		else
+		{
+			packet_buffer[idx++] = rx_byte;
+
+			if (idx == 11)
+			{
+				if (check_packet(packet_buffer))
+				{
+					LX = (int8_t)packet_buffer[1];
+					LY = (int8_t)packet_buffer[2];
+					RX = (int8_t)packet_buffer[3];
+					RY = (int8_t)packet_buffer[4];
+					R2 = packet_buffer[5];
+					L2 = packet_buffer[6];
+
+					uint16_t buttons =
+							packet_buffer[7] |
+							(packet_buffer[8] << 8);
+
+					uint16_t pressed = buttons & ~prev_buttons;
+
+					if (pressed)
+						enqueue_button_event(pressed);
+
+					prev_buttons = buttons;
+
+					HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+				}
+
+				idx = 0;
+			}
+		}
+
+		HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
+	}
+}
+
+void process_packet(void){
+	if(ready){
+		uint8_t local_buf[11];
+		__disable_irq();
+		memcpy(local_buf, packet_buffer, 11);
+		ready = false;
+		__enable_irq();
+
+		if(check_packet(local_buf)){
+			LX = (int8_t)local_buf[1];
+			LY = (int8_t)local_buf[2];
+			RX = (int8_t)local_buf[3];
+			RY = (int8_t)local_buf[4];
+			R2 = local_buf[5];
+			L2 = local_buf[6];
+		}
+	}
+}
+
+void process_button_events(void)
+{
+	while (event_tail != event_head) {
+
+		uint16_t evt = event_queue[event_tail];
+		event_tail = (event_tail + 1) % EVENT_QUEUE_SIZE;
+
+		if(evt & (1 << 0)) target+=5;
+		if(evt & (1 << 1)) target-=5;
+		if(evt & (1 << 2)) printf("Triangle\r\n");
+		if(evt & (1 << 3)) printf("Square\r\n");
+		if(evt & (1 << 4)) printf("L1\r\n");
+		if(evt & (1 << 5)) printf("R1\r\n");
+		if(evt & (1 << 6)) printf("Up\r\n");
+		if(evt & (1 << 7)) printf("Down\r\n");
+		if(evt & (1 << 8)) printf("Left\r\n");
+		if(evt & (1 << 9)) printf("Right\r\n");
+	}
+}
+
+void print_pots(void)
+{
+	printf("LX:%d  LY:%d  RX:%d  RY:%d  L2:%d  R2:%d\r\n", LX, LY, RX, RY, L2, R2);
+}
+
 stm32RoboClaw motor(&huart1,100);
+stm32RoboClaw motor2(&huart6,100);
 
 extern "C" int _write(int fd, char* ptr, int len) {
 	HAL_StatusTypeDef hstatus;
@@ -79,6 +245,60 @@ extern "C" int _write(int fd, char* ptr, int len) {
 	}
 	return -1;
 }
+
+void inv_kin(float x, float y, float z){
+	z = map(z, -100, 100, -50000, 50000); //maps value of output with range of speed of motors // 100
+	x = map(x, -100, 100, -50000, 50000); //maps xj1 values to max speed of motors
+	y = map(y, -100, 100, -50000, 50000); //maps yj1 values to max speed of motors
+
+	//inverse kinematics equation for each motor
+	vFL = -0.35*x - 0.35*y + 0.25*z;
+	vFR = -0.35*x + 0.35*y + 0.25*z;
+	vBL = 0.35*x - 0.35*y + 0.25*z;
+	vBR = 0.35*x + 0.35*y + 0.25*z;
+
+	vMAX = fmaxf(fmaxf(abs(vFL), abs(vBL)),fmaxf(abs(vFR), abs(vBR)));
+
+	if (vMAX > maxspeed) {
+		vFL = (vFL / vMAX) * maxspeed;
+		vBL = (vBL / vMAX) * maxspeed;
+		vFR = (vFR / vMAX) * maxspeed;
+		vBR = (vBR / vMAX) * maxspeed;
+	}
+
+
+	//safety constrain
+	//  vFL = constrain(vFL, -maxspeed, maxspeed);
+	//  vFR = constrain(vFR, -maxspeed, maxspeed);
+	//  vBL = constrain(vBL, -maxspeed, maxspeed);
+	//  vBR = constrain(vBR, -maxspeed, maxspeed);
+	if(vFL>maxspeed) vFL = maxspeed;
+	if(vFL<-maxspeed) vFL = -maxspeed;
+	if(vBL>maxspeed) vBL = maxspeed;
+	if(vBL<-maxspeed) vBL = -maxspeed;
+	if(vFR>maxspeed) vFR = maxspeed;
+	if(vFR<-maxspeed) vFR = -maxspeed;
+	if(vBR>maxspeed) vBR = maxspeed;
+	if(vBR<-maxspeed) vBR = -maxspeed;
+
+	motor.DutyM1(128, vBL);
+	motor.DutyM2(128, vFL);
+	motor.DutyM1(130, vBR);
+	motor.DutyM2(130, -vFR);
+	/*
+	 * BL= 128 M1
+	 * FL= 128 M2
+	 * FR= 130 M2
+	 * BR= 130 M1
+	 */
+}
+
+void motor_test(void){
+	motor.DutyM1(128, -10000);
+	motor.DutyM2(128, -10000);
+	motor.DutyM1(130, 10000);
+	motor.DutyM2(130, -10000);
+}
 /* USER CODE END 0 */
 
 /**
@@ -89,9 +309,6 @@ int main(void)
 {
 
 	/* USER CODE BEGIN 1 */
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // Enable tracing
-	DWT->CYCCNT = 0;                                // Reset counter
-	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;            // Enable cycle counter
 
 	/* USER CODE END 1 */
 
@@ -117,43 +334,30 @@ int main(void)
 	MX_USART1_UART_Init();
 	MX_USART2_UART_Init();
 	MX_USART3_UART_Init();
+	MX_USART6_UART_Init();
+
 	/* USER CODE BEGIN 2 */
-//	MPU6050_t mpu;
-//
-//	HAL_Delay(200);
-//
-//	printf("STM32 Booting...\r\n");
-//	HAL_Delay(10);
-//
-//	if(MPU6050_Init(&mpu, &hi2c1, 1, 0)!=0){
-//		printf("MPU6050 initialization failed!\r\n");
-//		while(1){
-//			//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-//		}
-//	}
-//
-//	printf("MPU6050 Initialized\r\n");
-//	HAL_Delay(2000);
-//
-//	MPU6050_CalcOffsets(&mpu,1,1);
-//
-//	mpu.last = micros();
-//
-//	MPU6050_Update(&mpu);
+	printf("STM32 ready\r\n");
+
+	HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART3_IRQn);
+	HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
+	bno055_assignI2C(&hi2c1);
+	bno055_setup();
+	bno055_setOperationModeNDOF();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		/* USER CODE END WHILE */
-//		MPU6050_Update(&mpu);
-//		printf("angleZ: %.4f\r\n", mpu.angleZ);
-//				motor.DutyM1(128,10000);
-//				motor.DutyM2(128,10000);
-//				motor.DutyM1(130,10000);
-//				motor.DutyM2(130,10000);
-		printf("hello\r\n");
+		process_button_events();
+		float v = bno055_getHeadingContinuous();
+		printf("Heading: %.2f\r\n", v);
+		//motor_test();
+		//inv_kin(LX, LY, 0);
+		motor2.DutyM2(130, -10000); //BR
+		motor.DutyM1(130, 10000);
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -343,6 +547,39 @@ static void MX_USART3_UART_Init(void)
 	/* USER CODE BEGIN USART3_Init 2 */
 
 	/* USER CODE END USART3_Init 2 */
+
+}
+
+/**
+  * @brief USART6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART6_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART6_Init 0 */
+
+  /* USER CODE END USART6_Init 0 */
+
+  /* USER CODE BEGIN USART6_Init 1 */
+
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART6_Init 2 */
+
+  /* USER CODE END USART6_Init 2 */
 
 }
 

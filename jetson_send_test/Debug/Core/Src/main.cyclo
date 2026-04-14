@@ -1,0 +1,15 @@
+../Core/Src/main.c:103:6:SendtoJetson	1
+../Core/Src/main.c:113:20:enqueue_button_event	2
+../Core/Src/main.c:123:6:check_packet	4
+../Core/Src/main.c:130:6:HAL_UART_RxCpltCallback	7
+../Core/Src/main.c:178:6:process_packet	3
+../Core/Src/main.c:197:6:process_button_events	12
+../Core/Src/main.c:217:6:print_pots	1
+../Core/Src/main.c:223:5:_write	4
+../Core/Src/main.c:244:5:main	1
+../Core/Src/main.c:309:6:SystemClock_Config	4
+../Core/Src/main.c:364:13:MX_UART5_Init	2
+../Core/Src/main.c:397:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:430:13:MX_USART3_UART_Init	2
+../Core/Src/main.c:463:13:MX_GPIO_Init	1
+../Core/Src/main.c:499:6:Error_Handler	1

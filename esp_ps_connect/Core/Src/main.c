@@ -244,6 +244,7 @@ int main(void)
 	{
 		process_packet();
 		process_button_events();
+		//printf("OK\r\n");
 		/* USER CODE END WHILE */
 		/* USER CODE BEGIN 3 */
 	}

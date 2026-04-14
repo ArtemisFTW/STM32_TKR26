@@ -7,9 +7,9 @@
 ../Core/Src/stm32roboclaw.cpp:36:6:void stm32RoboClaw::crc_update(uint8_t)	24	static
 ../Core/Src/stm32roboclaw.cpp:49:10:uint16_t stm32RoboClaw::crc_get()	16	static
 ../Core/Src/stm32roboclaw.cpp:54:6:)	36	static
-../Core/Src/stm32roboclaw.cpp:77:6:)	44	static
-../Core/Src/stm32roboclaw.cpp:154:8:virtual size_t stm32RoboClaw::write(uint8_t)	16	static
-../Core/Src/stm32roboclaw.cpp:160:6:bool stm32RoboClaw::overflow()	16	static
-../Core/Src/stm32roboclaw.cpp:165:5:virtual int stm32RoboClaw::read()	24	static
-../Core/Src/stm32roboclaw.cpp:174:6:virtual void stm32RoboClaw::flush()	24	static
-../Core/Src/stm32roboclaw.cpp:179:6:void stm32RoboClaw::clear()	24	static
+../Core/Src/stm32roboclaw.cpp:78:6:)	44	static
+../Core/Src/stm32roboclaw.cpp:155:8:virtual size_t stm32RoboClaw::write(uint8_t)	16	static
+../Core/Src/stm32roboclaw.cpp:161:6:bool stm32RoboClaw::overflow()	16	static
+../Core/Src/stm32roboclaw.cpp:166:5:virtual int stm32RoboClaw::read()	24	static
+../Core/Src/stm32roboclaw.cpp:175:6:virtual void stm32RoboClaw::flush()	24	static
+../Core/Src/stm32roboclaw.cpp:180:6:void stm32RoboClaw::clear()	24	static

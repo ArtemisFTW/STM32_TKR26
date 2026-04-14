@@ -1,0 +1,34 @@
+../Core/Inc/bno055_stm32.h:19:6:void bno055_assignI2C(I2C_HandleTypeDef*)	1
+../Core/Inc/bno055_stm32.h:23:6:void bno055_delay(int)	1
+../Core/Inc/bno055_stm32.h:31:6:void bno055_writeData(uint8_t, uint8_t)	23
+../Core/Inc/bno055_stm32.h:95:6:void bno055_readData(uint8_t, uint8_t*, uint8_t)	1
+C:\ST\STM32CubeIDE_1.19.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/cmath:177:3:constexpr float std::cos(float)	1
+C:\ST\STM32CubeIDE_1.19.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/cmath:400:3:constexpr float std::sin(float)	1
+../Core/Src/main.cpp:90:9:int16_t PID(float)	3
+../Core/Src/main.cpp:130:20:void enqueue_button_event(uint16_t)	2
+../Core/Src/main.cpp:140:6:bool check_packet(uint8_t*)	4
+../Core/Src/main.cpp:147:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	7
+../Core/Src/main.cpp:196:6:void process_packet()	3
+../Core/Src/main.cpp:215:6:void process_button_events()	16
+../Core/Src/main.cpp:277:6:void print_pots()	1
+../Core/Src/main.cpp:285:16:int _write(int, char*, int)	4
+../Core/Src/main.cpp:298:6:void inv_kin(float, float, float)	2
+../Core/Src/main.cpp:332:6:void motor_test()	1
+../Core/Src/main.cpp:339:6:void PotDeadzone()	9
+../Core/Src/main.cpp:347:6:void ModeSet()	5
+../Core/Src/main.cpp:354:6:void FOD(float)	1
+../Core/Src/main.cpp:367:5:int main()	1
+../Core/Src/main.cpp:439:6:void SystemClock_Config()	4
+../Core/Src/main.cpp:494:13:void MX_I2C1_Init()	2
+../Core/Src/main.cpp:528:13:void MX_UART4_Init()	2
+../Core/Src/main.cpp:561:13:void MX_UART5_Init()	2
+../Core/Src/main.cpp:594:13:void MX_USART1_UART_Init()	2
+../Core/Src/main.cpp:627:13:void MX_USART2_UART_Init()	2
+../Core/Src/main.cpp:660:13:void MX_USART3_UART_Init()	2
+../Core/Src/main.cpp:693:13:void MX_USART6_UART_Init()	2
+../Core/Src/main.cpp:726:13:void MX_GPIO_Init()	1
+../Core/Src/main.cpp:751:6:void Error_Handler()	1
+../Core/Src/main.cpp:760:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/main.cpp:760:1:void __static_initialization_and_destruction_1()	1
+../Core/Src/main.cpp:760:1:cpp)	1
+../Core/Src/main.cpp:760:1:cpp)	1
